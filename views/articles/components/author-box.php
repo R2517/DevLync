@@ -15,9 +15,19 @@ if (empty($article['author_name']))
                 alt="<?= htmlspecialchars($article['author_name']) ?>"
                 class="w-16 h-16 rounded-full object-cover flex-shrink-0 border-2 border-gray-200">
         <?php else: ?>
-            <div
-                class="w-16 h-16 rounded-full bg-blue-600 flex items-center justify-center flex-shrink-0 text-white text-xl font-bold">
-                <?= strtoupper(substr($article['author_name'], 0, 1)) ?>
+            <div class="w-16 h-16 rounded-full flex-shrink-0 relative overflow-hidden bg-gradient-to-br from-indigo-900 via-purple-900 to-black p-0.5 group">
+                <div class="absolute inset-0 bg-gradient-to-r from-blue-500 via-purple-500 to-indigo-500 animate-[spin_4s_linear_infinite] opacity-50 group-hover:opacity-100 transition-opacity"></div>
+                <div class="absolute inset-0.5 bg-gray-900 rounded-full flex items-center justify-center">
+                    <svg class="w-8 h-8 text-white relative z-10" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                        <path d="M21.54 15H17a2 2 0 0 0-2 2v4.54"/>
+                        <path d="M7 3.34V5a3 3 0 0 0 3 3v0a2 2 0 0 1 2 2v0c0 1.1.9 2 2 2v0a2 2 0 0 0 2-2v0c0-1.1.9-2 2-2h1.66"/>
+                        <path d="m11 7.33-1.63 2.11a2.03 2.03 0 0 0 0 2.47L11 14"/>
+                        <path d="M2 12c0 5.52 4.48 10 10 10s10-4.48 10-10S17.52 2 12 2 2 6.48 2 12Z"/>
+                    </svg>
+                    <!-- Glowing dots animation -->
+                    <div class="absolute w-1 h-1 bg-blue-400 rounded-full top-3 left-4 animate-pulse"></div>
+                    <div class="absolute w-1 h-1 bg-purple-400 rounded-full bottom-4 right-4 animate-[pulse_1.5s_ease-in-out_infinite]"></div>
+                </div>
             </div>
         <?php endif; ?>
         <div class="min-w-0 flex-1">

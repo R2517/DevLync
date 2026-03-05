@@ -6,6 +6,8 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Admin Login — DevLync</title>
     <meta name="robots" content="noindex">
+    <link rel="icon" type="image/svg+xml" href="<?= url('/assets/images/favicon.svg') ?>">
+    <link rel="icon" type="image/png" href="<?= url('/assets/images/favicon.png') ?>">
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;800&display=swap" rel="stylesheet">
     <script src="https://cdn.tailwindcss.com"></script>
     <style>
@@ -34,7 +36,8 @@
             </div>
         <?php endif; ?>
 
-        <form method="POST" action="<?= url('/admin/login') ?>" class="bg-gray-900 border border-gray-800 rounded-2xl p-6">
+        <form method="POST" action="<?= url('/admin/login') ?>"
+            class="bg-gray-900 border border-gray-800 rounded-2xl p-6">
             <div class="mb-4">
                 <label class="block text-xs font-medium text-gray-400 mb-1.5">Admin Password</label>
                 <input type="password" name="password" id="admin-password"
