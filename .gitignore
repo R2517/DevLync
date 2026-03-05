@@ -1,0 +1,52 @@
+# Dev/test files
+test*.php
+raw_test.php
+dump_500.php
+make_zip.php
+setup_prod.php
+fix_comparison.php
+fix_gemini_model.php
+crawl.php
+server.php
+debug_check.php
+test_boot.php
+test_simple.php
+test_log.php
+phpinfo_test.php
+
+# Data dumps
+*.sql
+*.csv
+*.zip
+*.tar.gz
+devlync_export.sql
+devlync_deploy.zip
+
+# Debug/output
+dev_log.txt
+output.html
+output2.html
+debug_error.log
+inspection.md
+
+# Build docs (not needed on server)
+DEVLYNC_AI_SUPERVISOR2.txt
+DEVLYNC_AUTOMATION_CENTER_COMPLETE_BUILD.md
+PLAN.md
+DEVLYNC DATA/
+websoite list.txt
+
+# Runtime dirs
+cache/
+logs/
+.git/
+
+# OS files
+Thumbs.db
+.DS_Store
+
+# Seed files
+seed.php
+seed.sql
+seed_articles.sql
+seed_bestof.sql

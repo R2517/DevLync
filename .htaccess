@@ -1,0 +1,65 @@
+RewriteEngine On
+
+# Remove trailing slash (preserving directory requests)
+RewriteCond %{REQUEST_FILENAME} !-d
+RewriteRule ^(.*)/$ $1 [R=301,L]
+
+# Serve sitemap.xml and feed directly via PHP
+RewriteRule ^sitemap\.xml$ sitemap.php [L]
+RewriteRule ^feed\.xml$ feed.php [L]
+
+# IndexNow public key file route: /{key}.txt -> indexnow-key.php
+RewriteRule ^([A-Za-z0-9_-]{8,128})\.txt$ indexnow-key.php?key=$1 [QSA,L]
+
+# Block all other .txt requests
+RewriteRule ^(?![A-Za-z0-9_-]{8,128}\.txt$).+\.txt$ - [F,L,NC]
+
+# Skip real files and directories
+RewriteCond %{REQUEST_FILENAME} !-f
+RewriteCond %{REQUEST_FILENAME} !-d
+
+# Route everything else through index.php
+RewriteRule ^(.*)$ index.php [QSA,L]
+
+# Security Headers
+<IfModule mod_headers.c>
+  Header set X-Content-Type-Options "nosniff"
+  Header set X-Frame-Options "SAMEORIGIN"
+  Header set X-XSS-Protection "1; mode=block"
+  Header set Referrer-Policy "strict-origin-when-cross-origin"
+  Header always set Permissions-Policy "camera=(), microphone=(), geolocation=()"
+  Header always set Strict-Transport-Security "max-age=31536000; includeSubDomains"
+  Header always set Content-Security-Policy "default-src 'self'; script-src 'self' 'unsafe-inline' 'unsafe-eval' https://cdn.tailwindcss.com https://cdn.jsdelivr.net https://unpkg.com https://fonts.googleapis.com; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com https://fonts.gstatic.com; font-src 'self' https://fonts.gstatic.com; img-src 'self' data: https:; connect-src 'self' https://cdn.tailwindcss.com https://cdn.jsdelivr.net https://unpkg.com; frame-ancestors 'none'"
+</IfModule>
+
+# Deny access to sensitive files
+<FilesMatch "\.(env|log|sql|sh|bak|md|zip|tar|gz|html)$">
+  Require all denied
+</FilesMatch>
+
+# Block installer, debug, and test scripts
+<FilesMatch "^(install|test|test_apis|test_apis_http|test_curl|test_routes|test_ui|test_supervisor_api|raw_test|dump_500|devlync_deploy)\.php$">
+  Require all denied
+</FilesMatch>
+
+# Block access to hidden directories
+<IfModule mod_rewrite.c>
+  RewriteRule ^(cache|logs|config|core|models|controllers)(/|$) - [F,L]
+</IfModule>
+
+# Cache static assets
+<IfModule mod_expires.c>
+  ExpiresActive On
+  ExpiresByType text/css "access plus 1 month"
+  ExpiresByType application/javascript "access plus 1 month"
+  ExpiresByType image/webp "access plus 1 year"
+  ExpiresByType image/png "access plus 1 year"
+  ExpiresByType image/jpeg "access plus 1 year"
+  ExpiresByType image/svg+xml "access plus 1 year"
+  ExpiresByType font/woff2 "access plus 1 year"
+</IfModule>
+
+# Gzip Compression
+<IfModule mod_deflate.c>
+  AddOutputFilterByType DEFLATE text/html text/css application/javascript application/json text/xml
+</IfModule>
