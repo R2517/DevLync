@@ -41,9 +41,20 @@ class Database
     public function query(string $sql, array $params = []): array
     {
         $start = microtime(true);
-        $stmt = $this->pdo->prepare($sql);
-        $stmt->execute($params);
-        $result = $stmt->fetchAll();
+        try {
+            $stmt = $this->pdo->prepare($sql);
+            $stmt->execute($params);
+            $result = $stmt->fetchAll();
+        } catch (PDOException $e) {
+            if ($this->isConnectionDropped($e)) {
+                $this->reconnect();
+                $stmt = $this->pdo->prepare($sql);
+                $stmt->execute($params);
+                $result = $stmt->fetchAll();
+            } else {
+                throw $e;
+            }
+        }
         $this->logSlowQuery($sql, microtime(true) - $start);
         return $result;
     }
@@ -58,9 +69,20 @@ class Database
     public function queryOne(string $sql, array $params = []): ?array
     {
         $start = microtime(true);
-        $stmt = $this->pdo->prepare($sql);
-        $stmt->execute($params);
-        $result = $stmt->fetch() ?: null;
+        try {
+            $stmt = $this->pdo->prepare($sql);
+            $stmt->execute($params);
+            $result = $stmt->fetch() ?: null;
+        } catch (PDOException $e) {
+            if ($this->isConnectionDropped($e)) {
+                $this->reconnect();
+                $stmt = $this->pdo->prepare($sql);
+                $stmt->execute($params);
+                $result = $stmt->fetch() ?: null;
+            } else {
+                throw $e;
+            }
+        }
         $this->logSlowQuery($sql, microtime(true) - $start);
         return $result;
     }
@@ -75,10 +97,22 @@ class Database
     public function execute(string $sql, array $params = []): int
     {
         $start = microtime(true);
-        $stmt = $this->pdo->prepare($sql);
-        $stmt->execute($params);
+        try {
+            $stmt = $this->pdo->prepare($sql);
+            $stmt->execute($params);
+            $count = $stmt->rowCount();
+        } catch (PDOException $e) {
+            if ($this->isConnectionDropped($e)) {
+                $this->reconnect();
+                $stmt = $this->pdo->prepare($sql);
+                $stmt->execute($params);
+                $count = $stmt->rowCount();
+            } else {
+                throw $e;
+            }
+        }
         $this->logSlowQuery($sql, microtime(true) - $start);
-        return $stmt->rowCount();
+        return $count;
     }
 
     /**
@@ -140,5 +174,24 @@ class Database
             );
             @file_put_contents($logFile, $entry, FILE_APPEND | LOCK_EX);
         }
+    }
+
+    /**
+     * Checks if a PDOException is caused by a dropped MySQL connection (e.g. timeout on Hostinger).
+     */
+    private function isConnectionDropped(PDOException $e): bool
+    {
+        $msg = $e->getMessage();
+        return strpos($msg, 'server has gone away') !== false ||
+            strpos($msg, 'Lost connection') !== false ||
+            strpos($msg, '2006') !== false;
+    }
+
+    /**
+     * Forces a reconnection to the database.
+     */
+    public function reconnect(): void
+    {
+        $this->pdo = createDatabaseConnection();
     }
 }
